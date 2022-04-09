@@ -1,13 +1,13 @@
 from asyncio.windows_events import NULL
 from re import X
 from unittest import result
-#from aStar import *
+from aStar import *
 import tkinter as tk
 import random
 import math
 import numpy as np
 import sys
-
+import time
 
 
 class Counter:
@@ -145,21 +145,6 @@ class Bot:
         return registryPassives
 
     def transferFunction(self,path):
-        # wandering behaviour
-        # if self.currentlyTurning==True:
-        #     self.vl = -2.0
-        #     self.vr = 2.0
-        #     self.turning -= 1
-        # else:
-        #     self.vl = 5.0
-        #     self.vr = 5.0
-        #     self.moving -= 1
-        # if self.moving==0 and not self.currentlyTurning:
-        #     self.turning = random.randrange(20,40)
-        #     self.currentlyTurning = True
-        # if self.turning==0 and self.currentlyTurning:
-        #     self.moving = random.randrange(50,100)
-        #     self.currentlyTurning = False
             if not path:
                 return 
             target = (path[0][0]*100 +50,path[0][1]*100+50)
@@ -178,7 +163,22 @@ class Bot:
             if chargerL<=200.0:
                 path.pop(0)
             
-
+    def wandering_transferFunction(self):
+        # wandering behaviour
+        if self.currentlyTurning==True:
+            self.vl = -2.0
+            self.vr = 2.0
+            self.turning -= 1
+        else:
+            self.vl = 5.0
+            self.vr = 5.0
+            self.moving -= 1
+        if self.moving==0 and not self.currentlyTurning:
+            self.turning = random.randrange(20,40)
+            self.currentlyTurning = True
+        if self.turning==0 and self.currentlyTurning:
+            self.moving = random.randrange(50,100)
+            self.currentlyTurning = False
 class Dirt:
     def __init__(self,namep,xx,yy):
         self.centreX = xx
@@ -249,16 +249,49 @@ def moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
         rr.transferFunction(path)
         rr.move(canvas,registryPassives,1.0)
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
+        #original = 2000
         numberOfMoves = 2000
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
         if not path:
-            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
     canvas.after(1,moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
+
+def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
+    moves += 1
+    for rr in registryActives:
+        rr.transferFunction(path)
+        rr.move(canvas,registryPassives,1.0)
+        registryPassives = rr.collectDirt(canvas,registryPassives, count)
+        #original = 2000
+        numberOfMoves = 2000
+        if moves>numberOfMoves:
+            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            window.destroy()
+            return
+        if not path:
+            print("total dirt collected in",moves,"moves is",count.dirtCollected)
+            window.destroy()
+            return
+    canvas.after(1,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
+
+def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window):
+    moves += 1
+    for rr in registryActives:
+        rr.wandering_transferFunction()
+        rr.move(canvas,registryPassives,1.0)
+        registryPassives = rr.collectDirt(canvas,registryPassives, count)
+        numberOfMoves = 2000
+        if moves>numberOfMoves:
+            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            window.destroy()
+            return
+    canvas.after(1,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
+
 
 def createOneRandomPath():
     totalSteps = 20
@@ -360,14 +393,14 @@ def geneticSearch():
     print("start genetic searching....")
     candidatePaths = []
     #generate random paths (5-10 random solutions, each got 20 steps from (9,9) to (0,0) randomly)
-    for i in range(10):
+    for i in range(5):
         tempPath = createOneRandomPath()
         print(tempPath)
         tempScore =  getDirtPoint(tempPath.copy())
         print(tempScore)
         candidatePaths.append((tempPath,tempScore))
     # main generations(input rounds)
-    for i in range(30):
+    for i in range(3):
         print("current generation round: " + str(i)) 
         #rank all cadidate solutions
         candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)
@@ -394,27 +427,47 @@ def geneticSearch():
     candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)    
     print("candidatepaths:")
     print(candidatePaths)
-    #return the best_path 
+    #return the best_path
     return candidatePaths[0][0]
 
 def aStarSearch_runOneExperiment():
+    start_time = time.time()
     window = tk.Tk()
     canvas = initialise(window)
     registryActives, registryPassives, count, map = register(canvas)
     moves = 0
     path = aStarSearch(map)
-    moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
+    aStar_moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
     window.mainloop()
+    computation_time = time.time() - start_time
+    print("computation time; "+ str(computation_time)) 
     return count.dirtCollected
 
 def geneticSearch_runOneExperiment():
     path = geneticSearch()
+    start_time = time.time()
     window = tk.Tk()
     canvas = initialise(window)
     registryActives, registryPassives, count, map = register(canvas)
     moves = 0
     moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
     window.mainloop()
+    computation_time = time.time() - start_time
+    print("computation time: "+ str(computation_time))
     return count.dirtCollected
-#geneticSearch()
-#geneticSearch_runOneExperiment()
+
+def wandering_runOneExperiment():
+    start_time = time.time()
+    window = tk.Tk()
+    canvas = initialise(window)
+    registryActives, registryPassives, count, map = register(canvas)
+    moves = 0
+    wandering_moveIt(canvas,registryActives,registryPassives, count, moves, window)
+    window.mainloop()
+    computation_time = time.time() - start_time
+    print("computation time: "+ str(computation_time))
+    return count.dirtCollected
+
+geneticSearch_runOneExperiment()
+#aStarSearch_runOneExperiment()
+#wandering_runOneExperiment()

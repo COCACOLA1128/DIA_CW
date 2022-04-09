@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import sys
+import time
 
 def makeSpecificGrid():
     grid = np.zeros((10,10),dtype=np.int16)
@@ -101,4 +102,4 @@ def aStarSearch(grid):
     # print(pathGrid)
     return(path)
 
-aStarSearch(makeSpecificGrid())
+#aStarSearch(makeSpecificGrid())
