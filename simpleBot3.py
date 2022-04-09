@@ -249,8 +249,7 @@ def moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
         rr.transferFunction(path)
         rr.move(canvas,registryPassives,1.0)
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
-        #original = 2000
-        numberOfMoves = 2000
+        numberOfMoves = 300
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
@@ -267,7 +266,6 @@ def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path
         rr.transferFunction(path)
         rr.move(canvas,registryPassives,1.0)
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
-        #original = 2000
         numberOfMoves = 2000
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
@@ -277,7 +275,7 @@ def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path
             print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
-    canvas.after(1,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
+    canvas.after(20,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
 
 def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window):
     moves += 1
@@ -290,11 +288,11 @@ def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window)
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
-    canvas.after(1,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
+    canvas.after(20,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
 
 
 def createOneRandomPath():
-    totalSteps = 20
+    totalSteps = 15
     allCoordinates = []
     path = []
     path.append( (9,9) )
@@ -306,6 +304,34 @@ def createOneRandomPath():
         path.append(allCoordinates[x])
     path.append( (0,0) )
     return path
+
+def createRandomPath():
+    totalSteps = 19
+    path = []
+    path.append( (9,9) )
+    currentPosition = (9,9)
+    while currentPosition != (0,0):
+        if currentPosition[0]>0:
+            possPosition1x = currentPosition[0]-1
+            possPosition1y = currentPosition[1]
+            pos1 = True
+        if currentPosition[1]>0:
+            possPosition2x = currentPosition[0]
+            possPosition2y = currentPosition[1]-1
+            pos2 = True
+        pos1Bigger = random.random()>=0.5
+        if (pos1 and not pos2) or (pos1 and pos2 and pos1Bigger):
+            path.append( (possPosition1x,possPosition1y) )
+            currentPosition = (possPosition1x,possPosition1y)
+        if (pos2 and not pos1) or (pos1 and pos2 and not pos1Bigger):
+            path.append( (possPosition2x,possPosition2y) )
+            currentPosition = (possPosition2x,possPosition2y)
+        pos1 = False
+        pos2 = False
+    print(path)
+    #path.append( (0,0) )
+    return path
+
 
 def PMX(parent1,parent2):
     list1 = parent1[0].copy()
@@ -350,14 +376,12 @@ def PMX(parent1,parent2):
     for i in range(0, len(fragment1)):
         offspring2List.insert(k22, fragment1[i])
         k22 += 1
-    print(offspring1List)
-    print(offspring2List)
     offspring1 = (offspring1List.copy(),getDirtPoint(offspring1List))
     offspring2 = (offspring2List.copy(),getDirtPoint(offspring2List))
     return offspring1,offspring2
 
 def inversion_Mutation(offspring):
-    Pm = 0.2
+    Pm = 0.1
     ret = random.random()
     list1 = offspring[0].copy()
     Score1 = offspring[1]
@@ -370,13 +394,9 @@ def inversion_Mutation(offspring):
         k2 = random.randint(1, len(list1) - 2)
         if k1 < k2:
             status = False
-    print(k1, k2)
     finallist[k1] = list1[k2]
     finallist[k2] = list1[k1]
-    print(finallist)
     finalResult = (finallist.copy(),getDirtPoint(finallist))
-    print("mutation inside: ")
-    print(finalResult)
     return finalResult
 
 def getDirtPoint(candidatePath):
@@ -393,14 +413,15 @@ def geneticSearch():
     print("start genetic searching....")
     candidatePaths = []
     #generate random paths (5-10 random solutions, each got 20 steps from (9,9) to (0,0) randomly)
-    for i in range(5):
-        tempPath = createOneRandomPath()
+    for i in range(50):
+        #tempPath = createOneRandomPath()
+        tempPath = createRandomPath()
         print(tempPath)
         tempScore =  getDirtPoint(tempPath.copy())
         print(tempScore)
         candidatePaths.append((tempPath,tempScore))
     # main generations(input rounds)
-    for i in range(3):
+    for i in range(10):
         print("current generation round: " + str(i)) 
         #rank all cadidate solutions
         candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)
@@ -414,19 +435,13 @@ def geneticSearch():
         # inversion_Mutation for each child(pm = 0.2)
         offspring11 = inversion_Mutation(offspring1)
         offspring22 = inversion_Mutation(offspring2)
-        #print("mutation:")
-        #print(offspring11)
-        #print(offspring22)
         # rank 2 parents and 2 children (4 paths)
         currentList = [parent1,parent2,offspring11,offspring22]
         currentList.sort(key=lambda tuple: tuple[1], reverse=True)
         # 2 bests solutions replace worst 2 of the candidate solutions(Steady-State strong elitism)
         candidatePaths[-1] = currentList[0]
-        candidatePaths[-2] = currentList[1]
-    
+        candidatePaths[-2] = currentList[1]   
     candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)    
-    print("candidatepaths:")
-    print(candidatePaths)
     #return the best_path
     return candidatePaths[0][0]
 
