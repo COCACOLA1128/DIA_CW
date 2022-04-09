@@ -102,4 +102,4 @@ def aStarSearch(grid):
     # print(pathGrid)
     return(path)
 
-#aStarSearch(makeSpecificGrid())
+aStarSearch(makeSpecificGrid())
