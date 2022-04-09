@@ -421,6 +421,7 @@ def geneticSearch():
         print(tempScore)
         candidatePaths.append((tempPath,tempScore))
     # main generations(input rounds)
+    bestSolution = candidatePaths[0]
     for i in range(10):
         print("current generation round: " + str(i)) 
         #rank all cadidate solutions
@@ -438,12 +439,15 @@ def geneticSearch():
         # rank 2 parents and 2 children (4 paths)
         currentList = [parent1,parent2,offspring11,offspring22]
         currentList.sort(key=lambda tuple: tuple[1], reverse=True)
+        if candidatePaths[0][1]>bestSolution[1]:
+            bestSolution = (candidatePaths[0][0].copy(),candidatePaths[0][1])
+            print("best solution changed")
         # 2 bests solutions replace worst 2 of the candidate solutions(Steady-State strong elitism)
         candidatePaths[-1] = currentList[0]
         candidatePaths[-2] = currentList[1]   
-    candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)    
+    candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)
     #return the best_path
-    return candidatePaths[0][0]
+    return bestSolution[0]
 
 def aStarSearch_runOneExperiment():
     start_time = time.time()
