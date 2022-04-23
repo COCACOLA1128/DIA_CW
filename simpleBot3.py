@@ -258,7 +258,7 @@ def moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
             print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
-    canvas.after(1,moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
+    canvas.after(0,moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
 
 def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
     moves += 1
@@ -275,7 +275,7 @@ def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path
             print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
-    canvas.after(20,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
+    canvas.after(0,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
 
 def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window):
     moves += 1
@@ -283,28 +283,31 @@ def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window)
         rr.wandering_transferFunction()
         rr.move(canvas,registryPassives,1.0)
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
-        numberOfMoves = 2000
+        numberOfMoves = 300
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
-    canvas.after(20,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
+    canvas.after(0,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
 
+def genetic_moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
+    moves += 1
+    for rr in registryActives:
+        rr.transferFunction(path)
+        rr.move(canvas,registryPassives,1.0)
+        registryPassives = rr.collectDirt(canvas,registryPassives, count)
+        numberOfMoves = 300
+        if moves>numberOfMoves:
+            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            window.destroy()
+            return
+        if not path:
+            print("total dirt collected in",moves,"moves is",count.dirtCollected)
+            window.destroy()
+            return
+    canvas.after(0,genetic_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
 
-def createOneRandomPath():
-    totalSteps = 15
-    allCoordinates = []
-    path = []
-    path.append( (9,9) )
-    for xx in range(10):
-        for yy in range(10):
-            allCoordinates.append((xx,yy))
-    index = random.sample(range(1, 99), totalSteps-2)
-    for x in index:
-        path.append(allCoordinates[x])
-    path.append( (0,0) )
-    return path
-
+# initial a random path 
 def createRandomPath():
     totalSteps = 19
     path = []
@@ -328,11 +331,9 @@ def createRandomPath():
             currentPosition = (possPosition2x,possPosition2y)
         pos1 = False
         pos2 = False
-    print(path)
-    #path.append( (0,0) )
     return path
 
-
+# cross over for genetic algorithm
 def PMX(parent1,parent2):
     list1 = parent1[0].copy()
     list2 = parent2[0].copy()
@@ -380,6 +381,7 @@ def PMX(parent1,parent2):
     offspring2 = (offspring2List.copy(),getDirtPoint(offspring2List))
     return offspring1,offspring2
 
+# muation for genetic alogrithm
 def inversion_Mutation(offspring):
     Pm = 0.1
     ret = random.random()
@@ -399,21 +401,22 @@ def inversion_Mutation(offspring):
     finalResult = (finallist.copy(),getDirtPoint(finallist))
     return finalResult
 
+#get dirt point for path
 def getDirtPoint(candidatePath):
     window = tk.Tk()
     canvas = initialise(window)
     registryActives, registryPassives, count, map = register(canvas)
     moves = 0
     moveIt(canvas,registryActives,registryPassives, count, moves, window,candidatePath)
-    window.withdraw()
     window.mainloop()
     return count.dirtCollected
 
-def geneticSearch():
+# find the best path by using genetic algorithm
+def geneticSearch(populationSize,generationTimes):
     print("start genetic searching....")
     candidatePaths = []
     #generate random paths (5-10 random solutions, each got 20 steps from (9,9) to (0,0) randomly)
-    for i in range(50):
+    for i in range(populationSize):
         #tempPath = createOneRandomPath()
         tempPath = createRandomPath()
         print(tempPath)
@@ -422,7 +425,7 @@ def geneticSearch():
         candidatePaths.append((tempPath,tempScore))
     # main generations(input rounds)
     bestSolution = candidatePaths[0]
-    for i in range(10):
+    for i in range(generationTimes):
         print("current generation round: " + str(i)) 
         #rank all cadidate solutions
         candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)
@@ -449,6 +452,7 @@ def geneticSearch():
     #return the best_path
     return bestSolution[0]
 
+# astar algorithm
 def aStarSearch_runOneExperiment():
     start_time = time.time()
     window = tk.Tk()
@@ -460,21 +464,24 @@ def aStarSearch_runOneExperiment():
     window.mainloop()
     computation_time = time.time() - start_time
     print("computation time; "+ str(computation_time)) 
-    return count.dirtCollected
+    return count.dirtCollected,computation_time
 
-def geneticSearch_runOneExperiment():
-    path = geneticSearch()
+# genetic algorithm
+# input population size and number of generations
+def geneticSearch_runOneExperiment(populationSize,generationTimes):
     start_time = time.time()
+    path = geneticSearch(populationSize,generationTimes)
     window = tk.Tk()
     canvas = initialise(window)
     registryActives, registryPassives, count, map = register(canvas)
     moves = 0
-    moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
+    genetic_moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
     window.mainloop()
     computation_time = time.time() - start_time
     print("computation time: "+ str(computation_time))
-    return count.dirtCollected
+    return count.dirtCollected, computation_time
 
+# wandering
 def wandering_runOneExperiment():
     start_time = time.time()
     window = tk.Tk()
@@ -485,8 +492,9 @@ def wandering_runOneExperiment():
     window.mainloop()
     computation_time = time.time() - start_time
     print("computation time: "+ str(computation_time))
-    return count.dirtCollected
+    return count.dirtCollected,computation_time
 
-geneticSearch_runOneExperiment()
+#geneticSearch_runOneExperiment()
 #aStarSearch_runOneExperiment()
 #wandering_runOneExperiment()
+#geneticSearch_runOneExperiment(50,300)

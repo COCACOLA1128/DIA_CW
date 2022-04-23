@@ -23,4 +23,5 @@ def runExperimentsWithDifferentParameters():
     plt.show()
 
 
-runExperimentsWithDifferentParameters()
+#runExperimentsWithDifferentParameters()
+runSetOfExperiments(5,2)
