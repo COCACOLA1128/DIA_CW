@@ -497,4 +497,4 @@ def wandering_runOneExperiment():
 #geneticSearch_runOneExperiment()
 #aStarSearch_runOneExperiment()
 #wandering_runOneExperiment()
-#geneticSearch_runOneExperiment(50,300)
+geneticSearch_runOneExperiment(50,300)

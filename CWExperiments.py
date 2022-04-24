@@ -30,6 +30,7 @@ def runSetOfExperiments_genetic(populationSize,generationTimes,numberOfRuns):
         dirtCollectedList.append(dirtCollected)
         computingTimeList.append(computingTime)
     return dirtCollectedList,computingTimeList
+
 #experiments one -- hyper parameters for genetic algorithm
 def generic_runExperimentsWithDifferentParameters(numberOfRuns):
     times_resultTable = {}
@@ -37,15 +38,18 @@ def generic_runExperimentsWithDifferentParameters(numberOfRuns):
     dirt_resultsTable["g=50"],times_resultTable["g=50"] = runSetOfExperiments_genetic(50,50,numberOfRuns)
     dirt_resultsTable["g=70"],times_resultTable["g=70"] = runSetOfExperiments_genetic(50,70,numberOfRuns)
     dirt_resultsTable["g=100"],times_resultTable["g=100"] = runSetOfExperiments_genetic(50,100,numberOfRuns)
-    dirt_resultsTable["g=300"],times_resultTable["g=300"] = runSetOfExperiments_genetic(50,200,numberOfRuns)
+    dirt_resultsTable["g=200"],times_resultTable["g=200"] = runSetOfExperiments_genetic(50,200,numberOfRuns)
     dirt_results = pd.DataFrame(dirt_resultsTable)
     times_results = pd.DataFrame(times_resultTable)
+    dirt_results.to_excel("dirt_genetic.xlsx")
+    times_results.to_excel("time_genetic.xlsx")
     print("total dirt collected means: ")
     print(dirt_results.mean(axis=0))
     print("total computing time means: ")
     print(times_results.mean(axis=0))
     dirt_results.boxplot(grid=False)
     plt.show()
+
 # experiments two -- contrack 3 different algorithms (genetic, a* and wandering) all with 300 steps. 
 def runExperimentsMain(populationSize,generationTimes,numberOfRuns):
     times_resultTable = {}
@@ -66,6 +70,7 @@ def runExperimentsMain(populationSize,generationTimes,numberOfRuns):
     print(times_results.mean(axis=0))
     dirt_results.boxplot(grid=False)
     plt.show()
+
 #runExperimentsWithDifferentParameters()
 #runSetOfExperiments_aStar(5)
 #runExperimentsMain(5,10,10)
