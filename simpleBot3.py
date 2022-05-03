@@ -267,11 +267,11 @@ def aStar_moveIt(canvas,registryActives,registryPassives,count,moves,window,path
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
         numberOfMoves = 2000
         if moves>numberOfMoves:
-            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
         if not path:
-            print("total dirt collected in",moves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
     canvas.after(0,aStar_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
@@ -284,7 +284,7 @@ def wandering_moveIt(canvas,registryActives,registryPassives,count,moves,window)
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
         numberOfMoves = 300
         if moves>numberOfMoves:
-            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
     canvas.after(0,wandering_moveIt,canvas,registryActives,registryPassives,count,moves,window)
@@ -297,11 +297,11 @@ def genetic_moveIt(canvas,registryActives,registryPassives,count,moves,window,pa
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
         numberOfMoves = 300
         if moves>numberOfMoves:
-            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
         if not path:
-            print("total dirt collected in",moves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
     canvas.after(0,genetic_moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
@@ -412,7 +412,6 @@ def getDirtPoint(candidatePath):
 
 # find the best path by using genetic algorithm
 def geneticSearch(populationSize,generationTimes):
-    print("start genetic searching....")
     candidatePaths = []
     #generate random paths (5-10 random solutions, each got 20 steps from (9,9) to (0,0) randomly)
     for i in range(populationSize):
@@ -462,7 +461,7 @@ def aStarSearch_runOneExperiment():
     aStar_moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
     window.mainloop()
     computation_time = time.time() - start_time
-    print("computation time; "+ str(computation_time)) 
+    #print("computation time; "+ str(computation_time)) 
     return count.dirtCollected,computation_time
 
 # genetic algorithm
@@ -477,7 +476,7 @@ def geneticSearch_runOneExperiment(populationSize,generationTimes):
     genetic_moveIt(canvas,registryActives,registryPassives, count, moves, window,path)
     window.mainloop()
     computation_time = time.time() - start_time
-    print("computation time: "+ str(computation_time))
+    #print("computation time: "+ str(computation_time))
     return count.dirtCollected, computation_time
 
 # wandering
@@ -490,10 +489,6 @@ def wandering_runOneExperiment():
     wandering_moveIt(canvas,registryActives,registryPassives, count, moves, window)
     window.mainloop()
     computation_time = time.time() - start_time
-    print("computation time: "+ str(computation_time))
+    #print("computation time: "+ str(computation_time))
     return count.dirtCollected,computation_time
 
-#geneticSearch_runOneExperiment()
-#aStarSearch_runOneExperiment()
-#wandering_runOneExperiment()
-geneticSearch_runOneExperiment(50,300)
