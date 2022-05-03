@@ -150,7 +150,6 @@ class Bot:
             target = (path[0][0]*100 +50,path[0][1]*100+50)
             chargerR = self.distanceToRightSensor(target[0],target[1])
             chargerL = self.distanceToLeftSensor(target[0],target[1])
-            
             if chargerR>chargerL:
                 self.vl = 2.0
                 self.vr = -2.0
@@ -251,11 +250,11 @@ def moveIt(canvas,registryActives,registryPassives,count,moves,window,path):
         registryPassives = rr.collectDirt(canvas,registryPassives, count)
         numberOfMoves = 300
         if moves>numberOfMoves:
-            print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             window.destroy()
             return
         if not path:
-            print("total dirt collected in",moves,"moves is",count.dirtCollected)
+            #print("total dirt collected in",moves,"moves is",count.dirtCollected)
             window.destroy()
             return
     canvas.after(0,moveIt,canvas,registryActives,registryPassives,count,moves,window,path)
@@ -383,7 +382,7 @@ def PMX(parent1,parent2):
 
 # muation for genetic alogrithm
 def inversion_Mutation(offspring):
-    Pm = 0.1
+    Pm = 0.01
     ret = random.random()
     list1 = offspring[0].copy()
     Score1 = offspring[1]
@@ -419,14 +418,14 @@ def geneticSearch(populationSize,generationTimes):
     for i in range(populationSize):
         #tempPath = createOneRandomPath()
         tempPath = createRandomPath()
-        print(tempPath)
+        #print(tempPath)
         tempScore =  getDirtPoint(tempPath.copy())
-        print(tempScore)
+        #print(tempScore)
         candidatePaths.append((tempPath,tempScore))
     # main generations(input rounds)
     bestSolution = candidatePaths[0]
     for i in range(generationTimes):
-        print("current generation round: " + str(i)) 
+        #print("current generation round: " + str(i)) 
         #rank all cadidate solutions
         candidatePaths.sort(key=lambda tuple: tuple[1], reverse=True)
         #choose best of 2 as populations(parents)
@@ -444,7 +443,7 @@ def geneticSearch(populationSize,generationTimes):
         currentList.sort(key=lambda tuple: tuple[1], reverse=True)
         if candidatePaths[0][1]>bestSolution[1]:
             bestSolution = (candidatePaths[0][0].copy(),candidatePaths[0][1])
-            print("best solution changed")
+            #print("best solution changed")
         # 2 bests solutions replace worst 2 of the candidate solutions(Steady-State strong elitism)
         candidatePaths[-1] = currentList[0]
         candidatePaths[-2] = currentList[1]   

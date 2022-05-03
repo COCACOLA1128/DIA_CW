@@ -23,7 +23,7 @@ def aStarSearch(grid):
     for xx in range(10):
         for yy in range(10):
             heuristicGrid[xx][yy] = 10*(xx + yy)
-    print(heuristicGrid)
+    #print(heuristicGrid)
     bestForPosition = np.zeros((10,10),dtype=np.int16)
     #visitedList = {}
     #visitedList[(9,9)] = heuristicGrid[9,9]
@@ -102,4 +102,4 @@ def aStarSearch(grid):
     # print(pathGrid)
     return(path)
 
-aStarSearch(makeSpecificGrid())
+#aStarSearch(makeSpecificGrid())

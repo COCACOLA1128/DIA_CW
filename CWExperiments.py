@@ -1,4 +1,6 @@
 from os import times_result
+
+from sympy import false
 from simpleBot3 import *
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -35,9 +37,9 @@ def runSetOfExperiments_genetic(populationSize,generationTimes,numberOfRuns):
 def generic_runExperimentsWithDifferentParameters(numberOfRuns):
     times_resultTable = {}
     dirt_resultsTable = {}
-    dirt_resultsTable["g=50"],times_resultTable["g=50"] = runSetOfExperiments_genetic(50,50,numberOfRuns)
-    dirt_resultsTable["g=70"],times_resultTable["g=70"] = runSetOfExperiments_genetic(50,70,numberOfRuns)
-    dirt_resultsTable["g=100"],times_resultTable["g=100"] = runSetOfExperiments_genetic(50,100,numberOfRuns)
+    dirt_resultsTable["g=50"],times_resultTable["g=50"] = runSetOfExperiments_genetic(10,50,numberOfRuns)
+    dirt_resultsTable["g=70"],times_resultTable["g=70"] = runSetOfExperiments_genetic(20,70,numberOfRuns)
+    dirt_resultsTable["g=100"],times_resultTable["g=100"] = runSetOfExperiments_genetic(30,100,numberOfRuns)
     dirt_resultsTable["g=200"],times_resultTable["g=200"] = runSetOfExperiments_genetic(50,200,numberOfRuns)
     dirt_results = pd.DataFrame(dirt_resultsTable)
     times_results = pd.DataFrame(times_resultTable)
@@ -48,6 +50,8 @@ def generic_runExperimentsWithDifferentParameters(numberOfRuns):
     print("total computing time means: ")
     print(times_results.mean(axis=0))
     dirt_results.boxplot(grid=False)
+    plt.show()
+    times_results.boxplot(grid =False)
     plt.show()
 
 # experiments two -- contrack 3 different algorithms (genetic, a* and wandering) all with 300 steps. 
@@ -70,8 +74,10 @@ def runExperimentsMain(populationSize,generationTimes,numberOfRuns):
     print(times_results.mean(axis=0))
     dirt_results.boxplot(grid=False)
     plt.show()
+    times_results.boxplot(grid=False)
+    plt.show()
 
-#runExperimentsWithDifferentParameters()
 #runSetOfExperiments_aStar(5)
 #runExperimentsMain(5,10,10)
-generic_runExperimentsWithDifferentParameters(10)
+#generic_runExperimentsWithDifferentParameters(50)
+runExperimentsMain(50,100,3)
