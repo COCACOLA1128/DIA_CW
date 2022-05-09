@@ -31,6 +31,13 @@ The implementation of GA is in simpleBot3.py
 
 The implementation of A-star algorithm is in aStar.py
 
+### Sample output
+All sample output is in the uploaded Excel files
+more details are shown in the report
+
+### Git Hub repository
+
+https://github.com/COCACOLA1128/DIA_CW.git
 ## Authors
 
 * Xuan HUANG 20126520
