@@ -95,6 +95,6 @@ def main(numberOfRuns):
     runExperimentsMain(50,100,numberOfRuns)
 
 
-main(100)
+main(2)
 
 
